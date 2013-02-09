@@ -13,7 +13,9 @@ If you don't plan on bootstrapping with server-side data, you can place static H
 # Prerequisites
 
 [Node.js](http://nodejs.org)
+
 [npm](https://npmjs.org)
+
 [SQLite3](http://www.sqlite.org)
 
 # Running the web server
