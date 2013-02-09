@@ -2,7 +2,7 @@
 
 A Node.js + express web application that provides data about Walt Disney World attractions via JSON endpoints.
 
-Data is pulled dynamically from the TouringPlans.com API, which does not support JSONP, and caches it in a simple SQLite table.
+Data is pulled dynamically from the [TouringPlans.com](http://www.touringplans.com) API, which does not support JSONP, and caches it in a simple SQLite table.
 
 This service makes a great (and fun) base for trying out JavaScript MVC frameworks including AngularJS and Backbone.js.
 
