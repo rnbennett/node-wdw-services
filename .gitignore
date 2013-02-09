@@ -1,3 +1,4 @@
+# Node.js
 lib-cov
 *.seed
 *.log
@@ -6,9 +7,41 @@ lib-cov
 *.out
 *.pid
 *.gz
-
 pids
 logs
 results
-
 npm-debug.log
+
+# JetBrains IDE
+*.iml
+*.ipr
+*.iws
+.idea/
+.idea/.name
+
+# Textmate
+*.tmproj
+*.tmproject
+tmtags
+
+# OS X
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Virtualenv
+env/
+
+# Django
+*.log
+*.pot
+*.pyc
+local_settings.py
+
+# Project Specific
+app.db
