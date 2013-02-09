@@ -22,6 +22,7 @@ If you don't plan on bootstrapping with server-side data, you can place static H
 
 For the first run, clone this project, then:
 
+	$ cd node-wdw-services
 	$ npm install
 	$ nodemon
 	
