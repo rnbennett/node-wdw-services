@@ -1,6 +1,6 @@
 # node-wdw-services
 
-A Node.js + express web application that provides data about Walt Disney World attractions via JSON endpoints.
+A Node.js + express web application that provides data about Walt Disney World attractions via RESTful JSON endpoints.
 
 Data is pulled dynamically from the [TouringPlans.com](http://www.touringplans.com) API, which does not support JSONP, and caches it in a simple SQLite table.
 
