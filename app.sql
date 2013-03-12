@@ -1,5 +1,6 @@
 CREATE TABLE parkCache (
-  permalink TEXT,
+  parkPermalink TEXT,
+  attractionPermalink TEXT,
   data TEXT
 );
 

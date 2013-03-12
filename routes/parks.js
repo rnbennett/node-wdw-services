@@ -63,42 +63,67 @@ exports.getParkAttractions = function (req, res) {
 };
 
 exports.getParkAttractionDetails = function (req, res) {
-	var park = _.findWhere(parks.parks, {"permalink": req.params.parkPermalink})
-	var cacheKey = req.params.parkPermalink + '|' + req.params.attractionPermalink;
-	req.db.get('SELECT * FROM parkCache WHERE permalink = ?', cacheKey, function(err, row){
-		if (row) {
-			data = {
-				park: park,
-				attraction: JSON.parse(row.data)
-			};
-			res.jsonp(data);
-		} else {
-			sourceUrl = TOURINGPLANS_PARK_ATTRACTION_DETAIL_URL.replace(/{{parkPermalink}}/g, req.params.parkPermalink);
-			sourceUrl = sourceUrl.replace(/{{attractionPermalink}}/g, req.params.attractionPermalink);
-			http.get(sourceUrl, function(response) {
-				var data = '';
+    var parkPermalink = req.params.parkPermalink;
+    var attractionPermalink = req.params.attractionPermalink;
+    var park = _.findWhere(parks.parks, {"permalink": parkPermalink})
+	req.db.get('SELECT * FROM parkCache WHERE parkPermalink = ? AND attractionPermalink = ?',
+        [parkPermalink, attractionPermalink],
+        function(err, row) {
+            if (row) {
+                // We have visited this endpoint before and cached the data.
+                // Setup return data payload.
+                data = {
+                    park: park,
+                    attraction: JSON.parse(row.data)
+                };
 
-				response.on('data', function(chunk) {
-					data += chunk;
-				});
+                data.attraction.comments = [];
 
-				response.on('end', function() {
-					req.db.run('INSERT INTO parkCache VALUES(?, ?)', [cacheKey, data]);
-					data = JSON.parse(data);
-					resData = {
-						park: park,
-						attraction: data
-					};
-					res.jsonp(resData);
-				});
-			});
-		}
-	});
+                // Get attraction comments.
+                req.db.each('SELECT email, score, details FROM parkAttractionComments WHERE parkPermalink = ? AND attractionPermalink = ?',
+                    [parkPermalink, attractionPermalink],
+                    function(err, row) {
+                        data.attraction.comments.push(
+                            {
+                                email: row.email,
+                                score: row.score,
+                                details: row.details
+                            }
+                        );
+                    },
+                    function (err, numRows) {
+                        res.jsonp(data);
+                    }
+                );
+            } else {
+                // This is the first time we're visiting this TouringPlans endpoint.
+                // We're assuming that there are no comments since we've never visited this endpoint before.
+                sourceUrl = TOURINGPLANS_PARK_ATTRACTION_DETAIL_URL.replace(/{{parkPermalink}}/g, req.params.parkPermalink);
+                sourceUrl = sourceUrl.replace(/{{attractionPermalink}}/g, req.params.attractionPermalink);
+                http.get(sourceUrl, function(response) {
+                    var data = '';
+
+                    response.on('data', function(chunk) {
+                        data += chunk;
+                    });
+
+                    response.on('end', function() {
+                        req.db.run('INSERT INTO parkCache VALUES(?, ?, ?)', [parkPermalink, attractionPermalink, data]);
+                        data = JSON.parse(data);
+                        resData = {
+                            park: park,
+                            attraction: data
+                        };
+                        res.jsonp(resData);
+                    });
+                });
+            }
+        }
+    );
 };
 
-/* Unit test on command line with:
- curl -X POST -d '{"email":"test@cli.com", "score": 5, "details": "test comment"}' http://localhost:3000/locations/parks/magic-kingdom/space-mountain/comment -H "Content-Type:application/json"
-*/
+// Unit test on command line with:
+// curl -X POST -d '{"email":"test@cli.com", "score": 5, "details": "test comment"}' http://localhost:3000/locations/parks/magic-kingdom/space-mountain/comment -H "Content-Type:application/json"
 exports.setParkAttractionComment = function (req, res) {
     var parkPermalink = req.params.parkPermalink;
     var attractionPermalink = req.params.attractionPermalink;

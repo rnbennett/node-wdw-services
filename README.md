@@ -28,9 +28,11 @@ For the first run, clone this project, then:
 	
 Use `nodemon` to run the app any time after. `nodemon` will restart the web server each time it detects a file change; use Ctrl-C to stop. You can find the `nodemon` documentation [here](https://github.com/remy/nodemon).
 
+**NOTE:** If you have previously cloned this repository, be sure to remove app.db before running `nodemon`.
+
 # Endpoints
 
-**/locations** - lists the type of locations in Walt Disney World.
+**GET: /locations** - lists the type of locations in Walt Disney World.
 
 	[
 	  {
@@ -47,7 +49,7 @@ Use `nodemon` to run the app any time after. `nodemon` will restart the web serv
 	  }
 	]
 	
-**/locations/parks** - lists the Theme Parks available.
+**GET: /locations/parks** - lists the Theme Parks available.
 
 	{
 	  "location": {
@@ -76,7 +78,7 @@ Use `nodemon` to run the app any time after. `nodemon` will restart the web serv
 	
 Note: Hotels and Dining are not yet implemented.
 	
-**/locations/parks/:parkPermaLink** - lists the attractions in a Theme Park.
+**GET: /locations/parks/:parkPermaLink** - lists the attractions in a Theme Park.
 
 	{
 	  "park": {
@@ -97,7 +99,7 @@ Note: Hotels and Dining are not yet implemented.
 	  ]
 	}
 	
-**/locations/parks/:parkPermaLink/:attractionPermaLink** - lists an attraction's details.
+**GET: /locations/parks/:parkPermaLink/:attractionPermaLink** - lists an attraction's details.
 
 	{
 	  "park": {
@@ -110,5 +112,20 @@ Note: Hotels and Dining are not yet implemented.
 	    "scope_and_scale_code": "minor_attraction",
 	    "intense": false
 		...
+        "comments": [
+          {
+            "email": "example@example.com",
+            "score": 5,
+            "details": "this is a comment"
+          }
+        ]
 	  }
+	}
+
+**POST: /locations/parks/:parkPermaLink/:attractionPermaLink/comment** - add a new comment on a specific attraction posting JSON data.
+
+	{
+        "email": "example@example.com",
+        "score": 5,
+        "details": "this is a comment"
 	}
