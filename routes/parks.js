@@ -1,5 +1,5 @@
-http = require('http');
-_ = require('underscore');
+var http = require('http');
+var _ = require('underscore');
 
 var locations = [
 	                {"permalink":"parks","name":"Theme Parks"},
@@ -94,4 +94,20 @@ exports.getParkAttractionDetails = function (req, res) {
 			});
 		}
 	});
+};
+
+/* Unit test on command line with:
+ curl -X POST -d '{"email":"test@cli.com", "score": 5, "details": "test comment"}' http://localhost:3000/locations/parks/magic-kingdom/space-mountain/comment -H "Content-Type:application/json"
+*/
+exports.setParkAttractionComment = function (req, res) {
+    var parkPermalink = req.params.parkPermalink;
+    var attractionPermalink = req.params.attractionPermalink;
+    var email = req.body.email;
+    var score = req.body.score;
+    var details = req.body.details;
+
+    req.db.run('INSERT INTO parkAttractionComments (parkPermalink, attractionPermalink, email, score, details) VALUES (?, ?, ?, ?, ?)',
+        [parkPermalink, attractionPermalink, email, score, details]);
+
+    res.send(200, {status: 'ok'});
 };

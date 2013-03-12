@@ -51,10 +51,11 @@ app.configure('development', function(){
 });
 
 // app.get('/', routes.index);
-app.get('/locations', parks.getLocations)
-app.get('/locations/parks', parks.getParks)
-app.get('/locations/parks/:parkPermalink', parks.getParkAttractions)
-app.get('/locations/parks/:parkPermalink/:attractionPermalink', parks.getParkAttractionDetails)
+app.get('/locations', parks.getLocations);
+app.get('/locations/parks', parks.getParks);
+app.get('/locations/parks/:parkPermalink', parks.getParkAttractions);
+app.get('/locations/parks/:parkPermalink/:attractionPermalink', parks.getParkAttractionDetails);
+app.post('/locations/parks/:parkPermalink/:attractionPermalink/comment', parks.setParkAttractionComment);
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
