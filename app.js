@@ -8,10 +8,27 @@ var express = require('express')
   , routes = require('./routes')
   , parks = require('./routes/parks')
   , http = require('http')
-  , path = require('path');
+  , path = require('path')
+  , fs = require('fs');
 
 var app = express();
-var db = new sqlite3.Database('./app.db');
+var db = null;
+
+// Create application database if it does not exist.
+fs.exists('./app.db', function (exists) {
+    db = new sqlite3.Database('./app.db');
+
+    if (!exists) {
+        console.info('Creating database. This may take a while...');
+        fs.readFile('app.sql', 'utf8', function (err, data) {
+            if (err) throw err;
+            db.exec(data, function (err) {
+                if (err) throw err;
+                console.info('Done.');
+            });
+        });
+    }
+});
 
 app.configure(function(){
   app.set('port', process.env.PORT || 3000);
