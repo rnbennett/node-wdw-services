@@ -31,8 +31,9 @@ exports.getParks = function(req, res){
 };
 
 exports.getParkAttractions = function (req, res) {
-	var park = _.findWhere(parks.parks, {"permalink": req.params.parkPermalink})
-	req.db.get('SELECT * FROM parkCache WHERE permalink = ?', req.params.parkPermalink, function(err, row){
+    var permalink = req.params.parkPermalink;
+    var park = _.findWhere(parks.parks, {"permalink": permalink})
+	req.db.get('SELECT * FROM parkCache WHERE parkPermalink = ? AND attractionPermalink IS NULL', permalink, function(err, row){
 		if (row) {
 			data = {
 				park: park,
@@ -40,7 +41,7 @@ exports.getParkAttractions = function (req, res) {
 			};
 			res.jsonp(data);
 		} else {
-			sourceUrl = TOURINGPLANS_PARK_ATTRACTION_LIST_URL.replace(/{{parkPermalink}}/g, req.params.parkPermalink);
+			sourceUrl = TOURINGPLANS_PARK_ATTRACTION_LIST_URL.replace(/{{parkPermalink}}/g, permalink);
 			http.get(sourceUrl, function(response) {
 				var data = '';
 
@@ -49,7 +50,7 @@ exports.getParkAttractions = function (req, res) {
 				});
 
 				response.on('end', function() {
-					req.db.run('INSERT INTO parkCache VALUES(?, ?)', [req.params.parkPermalink, data]);					
+                    req.db.run('INSERT INTO parkCache (parkPermalink, data) VALUES (?, ?)', [permalink, data]);
 					data = JSON.parse(data);
 					resData = {
 						park: park,
