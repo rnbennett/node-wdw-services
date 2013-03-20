@@ -1,25 +1,8 @@
 var helper = require('./test-helper.js'),
-    sqlite3 = require('sqlite3'),
-    fs = require('fs'),
+    cacheProvider = require('../providers/park-cache-provider.js').ParkCacheProvider,
+    cache = new cacheProvider(),
     _ = require('underscore'),
-    timestamp = new Date(),
-    db = null;
-
-// Create application database if it does not exist.
-fs.exists('./app.db', function (exists) {
-    db = new sqlite3.Database('./app.db');
-
-    if (!exists) {
-        console.info('Creating database. This may take a while...');
-        fs.readFile('app.sql', 'utf8', function (err, data) {
-            if (err) throw err;
-            db.exec(data, function (err) {
-                if (err) throw err;
-                console.info('Done.');
-            });
-        });
-    }
-});
+    timestamp = new Date();
 
 describe("The WDW Node Service", function() {
     describe("GET /locations", function() {
@@ -111,8 +94,8 @@ describe("The WDW Node Service", function() {
         });
 
         it("has been placed in cache", function(done) {
-            db.get('SELECT * FROM parkCache WHERE parkPermalink = ? AND attractionPermalink IS NULL', 'magic-kingdom', function(err, row){
-                expect(row).toBeTruthy();
+            cache.get({"parkPermalink": "magic-kingdom"}, function(err, data) {
+                expect(data).toBeTruthy();
                 done();
             });
         });
@@ -152,8 +135,8 @@ describe("The WDW Node Service", function() {
         });
 
         it("has been placed in cache", function(done) {
-            db.get('SELECT * FROM parkCache WHERE parkPermalink = ? AND attractionPermalink = ?', ['magic-kingdom', 'space-mountain'], function(err, row){
-                expect(row).toBeTruthy();
+            cache.get({"parkPermalink": "magic-kingdom", "attractionPermalink": "space-mountain"}, function(err, data){
+                expect(data).toBeTruthy();
                 done();
             });
         });
