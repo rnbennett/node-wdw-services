@@ -129,3 +129,13 @@ Note: Hotels and Dining are not yet implemented.
         "score": 5,
         "details": "this is a comment"
 	}
+
+# Running the tests
+
+Jasmine spec tests are located in the spec folder. Tests require installing [jasmine-node](https://github.com/mhevery/jasmine-node) globally via NPM.
+
+To run tests once jasmine-node is installed:
+
+    jasmine-node ./spec
+
+Note that there is no need to start the app before running the tests.
