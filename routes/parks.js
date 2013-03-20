@@ -6,20 +6,20 @@ var http = require('http'),
     comments = new commentProvider();
 
 var locations = [
-	                {"permalink":"parks","name":"Theme Parks"},
-	                {"permalink":"hotels","name":"Hotels"},
-	                {"permalink":"dining","name":"Dining"}
-            	];
+    {"permalink":"parks","name":"Theme Parks"},
+    {"permalink":"hotels","name":"Hotels"},
+    {"permalink":"dining","name":"Dining"}
+];
 
 var parks = {
-				"location": {"permalink":"parks","name":"Theme Parks"},
-				"parks": [
-		            	{"permalink":"magic-kingdom","name":"Magic Kingdom"},
-			            {"permalink":"epcot","name":"Epcot"},
-			            {"permalink":"hollywood-studios","name":"Disney's Hollywood Studios"},
-			            {"permalink":"animal-kingdom","name":"Disney's Animal Kingdom"}
-				]
-			};
+        "location": {"permalink":"parks","name":"Theme Parks"},
+        "parks": [
+                {"permalink":"magic-kingdom","name":"Magic Kingdom"},
+                {"permalink":"epcot","name":"Epcot"},
+                {"permalink":"hollywood-studios","name":"Disney's Hollywood Studios"},
+                {"permalink":"animal-kingdom","name":"Disney's Animal Kingdom"}
+        ]
+    };
 
 var TOURINGPLANS_PARK_ATTRACTION_LIST_URL = 'http://touringplans.com/{{parkPermalink}}/attractions.json';
 var TOURINGPLANS_PARK_ATTRACTION_DETAIL_URL = 'http://touringplans.com/{{parkPermalink}}/attractions/{{attractionPermalink}}.json';

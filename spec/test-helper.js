@@ -38,5 +38,5 @@ exports.withServer = function(done, callback) {
         done();
     };
     server = app.listen(3000);
-    return callback(new Requester, stopServer);
+    return callback(new Requester(), stopServer);
 };

@@ -18,17 +18,25 @@ If you don't plan on bootstrapping with server-side data, you can place static H
 
 [SQLite3](http://www.sqlite.org)
 
+[jasmine-node](https://github.com/mhevery/jasmine-node)
+
+[Grunt](http://gruntjs.com)
+
 # Running the web server
+
+Before running, ensure that you have `grunt` and `jasmine-node` installed:
+
+    npm install -g grunt-cli jasmine-node
 
 For the first run, clone this project, then:
 
 	$ cd node-wdw-services
 	$ npm install
-	$ nodemon
+	$ grunt server
 	
-Use `nodemon` to run the app any time after. `nodemon` will restart the web server each time it detects a file change; use Ctrl-C to stop. You can find the `nodemon` documentation [here](https://github.com/remy/nodemon).
+Use `grunt server` to run the app any time after. `grunt server` will restart the web server each time it detects a file change; use Ctrl-C to stop.
 
-**NOTE:** If you have previously cloned this repository, be sure to remove app.db before running `nodemon`.
+**NOTE:** If you have previously cloned this repository, be sure to remove app.db before running `grunt server`.
 
 # Endpoints
 
@@ -123,6 +131,7 @@ Note: Hotels and Dining are not yet implemented.
 	}
 
 **POST: /locations/parks/:parkPermaLink/:attractionPermaLink/comment** - add a new comment on a specific attraction posting JSON data.
+Be sure to specify `Content-Type: application/json` in the HTTP header of your POST request.
 
 	{
         "email": "example@example.com",
@@ -136,6 +145,6 @@ Jasmine spec tests are located in the spec folder. Tests require installing [jas
 
 To run tests once jasmine-node is installed:
 
-    jasmine-node ./spec
+    $ grunt
 
 Note that there is no need to start the app before running the tests.

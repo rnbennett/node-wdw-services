@@ -3,13 +3,13 @@
  * Module dependencies.
  */
 
-var express = require('express')
-  , sqlite3 = require('sqlite3')
-  , parks = require('./routes/parks')
-  , http = require('http')
-  , path = require('path')
-  , fs = require('fs')
-  , db = null;
+var express = require('express'),
+    sqlite3 = require('sqlite3'),
+    parks = require('./routes/parks'),
+    http = require('http'),
+    path = require('path'),
+    fs = require('fs'),
+    db = null;
 
 //Export app so it is accessible for unit testing.
 exports.app = app = express();
@@ -62,4 +62,4 @@ if (__filename == process.argv[1]) {
     http.createServer(app).listen(app.get('port'), function(){
       console.log("Express server listening on port " + app.get('port'));
     });
-};
+}

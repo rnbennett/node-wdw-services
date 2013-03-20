@@ -1,21 +1,31 @@
 {
   "name": "node-wdw-services",
-  "version": "0.0.1",
+  "version": "0.0.3",
+  "description": "A Node.js + express web application that provides data about Walt Disney World attractions via RESTful JSON endpoints.",
   "main": "app.js",
   "dependencies": {
-    "express": "3.1.0",
     "ejs": "*",
-    "less-middleware": "*",
+    "express": "~3.1.0",
+    "less-middleware": "~0.1.9",
     "sqlite3": "~2.1.5",
     "underscore": "~1.4.4"
   },
   "devDependencies": {
-    "request": "~2.16.6"
+    "request": "~2.16.6",
+    "grunt": "~0.4.1",
+    "grunt-contrib-jshint": "~0.3.0",
+    "grunt-jasmine-node": "0.0.6",
+    "supervisor": "~0.5.2"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jasmine-node ./spec"
   },
-  "repository": "",
-  "author": "",
-  "license": "MIT"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rnbennett/node-wdw-services.git"
+  },
+  "author": "Ryan Bennett",
+  "license": "MIT",
+  "gitHead": "f32ba6323994deb2c4f22bb27b023de8250e919d",
+  "readmeFilename": "README.md"
 }
