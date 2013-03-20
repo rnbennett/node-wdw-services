@@ -1,5 +1,5 @@
 {
-  "name": "wdw-angular-express",
+  "name": "node-wdw-services",
   "version": "0.0.1",
   "main": "app.js",
   "dependencies": {
@@ -9,7 +9,9 @@
     "sqlite3": "~2.1.5",
     "underscore": "~1.4.4"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "request": "~2.16.6"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

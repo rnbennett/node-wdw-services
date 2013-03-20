@@ -5,13 +5,12 @@
 
 var express = require('express')
   , sqlite3 = require('sqlite3')
-  , routes = require('./routes')
   , parks = require('./routes/parks')
   , http = require('http')
   , path = require('path')
   , fs = require('fs');
 
-var app = express();
+exports.app = app = express();
 var db = null;
 
 // Create application database if it does not exist.
@@ -50,13 +49,15 @@ app.configure('development', function(){
   app.use(express.errorHandler());
 });
 
-// app.get('/', routes.index);
 app.get('/locations', parks.getLocations);
 app.get('/locations/parks', parks.getParks);
 app.get('/locations/parks/:parkPermalink', parks.getParkAttractions);
 app.get('/locations/parks/:parkPermalink/:attractionPermalink', parks.getParkAttractionDetails);
 app.post('/locations/parks/:parkPermalink/:attractionPermalink/comment', parks.setParkAttractionComment);
 
-http.createServer(app).listen(app.get('port'), function(){
-  console.log("Express server listening on port " + app.get('port'));
-});
+//Only run the server if this file is run directly. Lets us use test-helper for testing.
+if (__filename == process.argv[1]) {
+    http.createServer(app).listen(app.get('port'), function(){
+      console.log("Express server listening on port " + app.get('port'));
+    });
+};
