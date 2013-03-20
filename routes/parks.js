@@ -53,7 +53,7 @@ exports.getParkAttractions = function (req, res) {
                 });
 
                 response.on('end', function() {
-                    cache.insert({"parkPermalink": permalink, "data": data});
+                    cache.save({"parkPermalink": permalink, "data": data});
                     data = JSON.parse(data);
                     result = {
                         park: park,
@@ -100,7 +100,7 @@ exports.getParkAttractionDetails = function (req, res) {
                });
 
                response.on('end', function() {
-                   cache.insert({"parkPermalink": parkPermalink, "attractionPermalink": attractionPermalink, "data" : data});
+                   cache.save({"parkPermalink": parkPermalink, "attractionPermalink": attractionPermalink, "data" : data});
                    data = JSON.parse(data);
                    result = {
                        park: park,

@@ -1,48 +1,26 @@
-var sqlite3 = require('sqlite3'),
-    fs = require('fs');
+var Provider = require('./provider.js').Provider;
 
-    function ParkCacheProvider () {
-        // Create application database if it does not exist.
-        this.db = null;
+function ParkCacheProvider () {}
 
-        var that = this;
+ParkCacheProvider.prototype = new Provider();
 
-        fs.exists('./app.db', function (exists) {
-            that.db = new sqlite3.Database('./app.db');
+ParkCacheProvider.prototype.save = function(item) {
+    this.db.run('INSERT INTO parkCache (parkPermalink, attractionPermalink, data) VALUES (?, ?, ?)',
+        [item.parkPermalink, item.attractionPermalink, item.data]);
+};
 
-            if (!exists) {
-                console.info('Creating database. This may take a while...');
-                fs.exists('app.sql', 'utf8', function (err, data) {
-                    if (err) throw err;
-                    that.db.exec(data, function (err) {
-                        if (err) throw err;
-                        console.info('Done.');
-                    });
-                });
-            }
-        });
-    }
+ParkCacheProvider.prototype.get = function(item, callback) {
+    var whereParkPermalink = item.parkPermalink ? "parkPermalink = ?" : "parkPermalink IS NULL";
+    var whereAttractionPermalink = item.attractionPermalink ? "attractionPermalink = ?" : "attractionPermalink IS NULL";
+    var query = 'SELECT * FROM parkCache WHERE ' + whereParkPermalink + ' AND ' + whereAttractionPermalink;
 
-    ParkCacheProvider.prototype = {
-
-        insert: function(item) {
-            this.db.run('INSERT INTO parkCache (parkPermalink, attractionPermalink, data) VALUES (?, ?, ?)',
-                [item.parkPermalink, item.attractionPermalink, item.data]);
-        },
-
-        get: function(item, callback) {
-            var whereParkPermalink = item.parkPermalink ? "parkPermalink = ?" : "parkPermalink IS NULL";
-            var whereAttractionPermalink = item.attractionPermalink ? "attractionPermalink = ?" : "attractionPermalink IS NULL";
-            var query = 'SELECT * FROM parkCache WHERE ' + whereParkPermalink + ' AND ' + whereAttractionPermalink;
-
-            this.db.get(query,
-                [item.parkPermalink, item.attractionPermalink],
-                function(err, row) {
-                    var data = row ? JSON.parse(row.data) : null;
-                    callback(err, data);
-                }
-            );
+    this.db.get(query,
+        [item.parkPermalink, item.attractionPermalink],
+        function(err, row) {
+            var data = row ? JSON.parse(row.data) : null;
+            callback(err, data);
         }
-    };
+    );
+};
 
 exports.ParkCacheProvider = ParkCacheProvider;
