@@ -1,7 +1,9 @@
 var http = require('http'),
     _ = require('underscore'),
-    cacheProvider = require('../park-cache-provider.js').ParkCacheProvider,
-    cache = new cacheProvider();
+    cacheProvider = require('../providers/park-cache-provider.js').ParkCacheProvider,
+    commentProvider = require('../providers/park-comment-provider.js').ParkCommentProvider,
+    cache = new cacheProvider(),
+    comments = new commentProvider();
 
 var locations = [
 	                {"permalink":"parks","name":"Theme Parks"},
@@ -67,34 +69,24 @@ exports.getParkAttractions = function (req, res) {
 exports.getParkAttractionDetails = function (req, res) {
     var parkPermalink = req.params.parkPermalink;
     var attractionPermalink = req.params.attractionPermalink;
-    var park = _.findWhere(parks.parks, {"permalink": parkPermalink})
-    cache.get({"parkPermalink": parkPermalink, "attractionPermalink": attractionPermalink}, function(err, data) {
+    var filter = {"parkPermalink": parkPermalink, "attractionPermalink": attractionPermalink};
+    var park = _.findWhere(parks.parks, {"permalink": parkPermalink});
+
+    cache.get(filter, function(err, data) {
        if (data) {
            // We have visited this endpoint before and cached the data.
            // Setup return data payload.
+
            result = {
                park: park,
                attraction: data
            };
 
-           result.attraction.comments = [];
-
            // Get attraction comments.
-           req.db.each('SELECT email, score, details FROM parkAttractionComments WHERE parkPermalink = ? AND attractionPermalink = ?',
-               [parkPermalink, attractionPermalink],
-               function(err, row) {
-                   result.attraction.comments.push(
-                       {
-                           email: row.email,
-                           score: row.score,
-                           details: row.details
-                       }
-                   );
-               },
-               function (err, numRows) {
-                   res.jsonp(result);
-               }
-           );
+           comments.get(filter, function(err, data) {
+               result.attraction.comments = data;
+               res.jsonp(result);
+           });
        } else {
            // This is the first time we're visiting this TouringPlans endpoint.
            // We're assuming that there are no comments since we've never visited this endpoint before.
@@ -124,14 +116,15 @@ exports.getParkAttractionDetails = function (req, res) {
 // Unit test on command line with:
 // curl -X POST -d '{"email":"test@cli.com", "score": 5, "details": "test comment"}' http://localhost:3000/locations/parks/magic-kingdom/space-mountain/comment -H "Content-Type:application/json"
 exports.setParkAttractionComment = function (req, res) {
-    var parkPermalink = req.params.parkPermalink;
-    var attractionPermalink = req.params.attractionPermalink;
-    var email = req.body.email;
-    var score = req.body.score;
-    var details = req.body.details;
+    var data = {
+        "parkPermalink": req.params.parkPermalink,
+        "attractionPermalink": req.params.attractionPermalink,
+        "email": req.body.email,
+        "score": req.body.score,
+        "details": req.body.details
+    };
 
-    req.db.run('INSERT INTO parkAttractionComments (parkPermalink, attractionPermalink, email, score, details) VALUES (?, ?, ?, ?, ?)',
-        [parkPermalink, attractionPermalink, email, score, details]);
+    comments.save(data);
 
     res.send(200, {status: 'ok'});
 };

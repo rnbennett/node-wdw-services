@@ -12,7 +12,7 @@ var sqlite3 = require('sqlite3'),
 
             if (!exists) {
                 console.info('Creating database. This may take a while...');
-                fs.readFile('app.sql', 'utf8', function (err, data) {
+                fs.exists('app.sql', 'utf8', function (err, data) {
                     if (err) throw err;
                     that.db.exec(data, function (err) {
                         if (err) throw err;
@@ -31,7 +31,6 @@ var sqlite3 = require('sqlite3'),
         },
 
         get: function(item, callback) {
-            //parkPermalink, attractionPermalink
             var whereParkPermalink = item.parkPermalink ? "parkPermalink = ?" : "parkPermalink IS NULL";
             var whereAttractionPermalink = item.attractionPermalink ? "attractionPermalink = ?" : "attractionPermalink IS NULL";
             var query = 'SELECT * FROM parkCache WHERE ' + whereParkPermalink + ' AND ' + whereAttractionPermalink;

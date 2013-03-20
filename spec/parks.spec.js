@@ -190,7 +190,6 @@ describe("The WDW Node Service", function() {
                 r.get("/locations/parks/magic-kingdom/space-mountain", function(err, res, body){
                     var data = JSON.parse(body);
                     var result = _.findWhere(data.attraction.comments, {"details": timestamp.valueOf().toString()});
-                    console.log(result);
                     expect(result).toBeTruthy();
                     end();
                 });
