@@ -1,7 +1,25 @@
-//var request = require('http');
-var helper = require('./test-helper.js');
-var _ = require('underscore');
-var timestamp = new Date();
+var helper = require('./test-helper.js'),
+    sqlite3 = require('sqlite3'),
+    fs = require('fs'),
+    _ = require('underscore'),
+    timestamp = new Date(),
+    db = null;
+
+// Create application database if it does not exist.
+fs.exists('./app.db', function (exists) {
+    db = new sqlite3.Database('./app.db');
+
+    if (!exists) {
+        console.info('Creating database. This may take a while...');
+        fs.readFile('app.sql', 'utf8', function (err, data) {
+            if (err) throw err;
+            db.exec(data, function (err) {
+                if (err) throw err;
+                console.info('Done.');
+            });
+        });
+    }
+});
 
 describe("The WDW Node Service", function() {
     describe("GET /locations", function() {
@@ -92,6 +110,13 @@ describe("The WDW Node Service", function() {
             });
         });
 
+        it("has been placed in cache", function(done) {
+            db.get('SELECT * FROM parkCache WHERE parkPermalink = ? AND attractionPermalink IS NULL', 'magic-kingdom', function(err, row){
+                expect(row).toBeTruthy();
+                done();
+            });
+        });
+
     });
 
     describe("GET /locations/parks/:parkPermalink/:attractionPermalink", function() {
@@ -126,6 +151,13 @@ describe("The WDW Node Service", function() {
             });
         });
 
+        it("has been placed in cache", function(done) {
+            db.get('SELECT * FROM parkCache WHERE parkPermalink = ? AND attractionPermalink = ?', ['magic-kingdom', 'space-mountain'], function(err, row){
+                expect(row).toBeTruthy();
+                done();
+            });
+        });
+
     });
 
     describe("POST /locations/parks/:parkPermalink/:attractionPermalink/comment", function() {
@@ -153,11 +185,12 @@ describe("The WDW Node Service", function() {
 
     describe("Attraction comments in GET /locations/parks/:parkPermalink/:attractionPermalink", function() {
 
-        it("contains the data POSTed in the last test", function(done) {
+        it("contains the comment POSTed in the last test", function(done) {
             helper.withServer(done, function(r, end) {
                 r.get("/locations/parks/magic-kingdom/space-mountain", function(err, res, body){
                     var data = JSON.parse(body);
                     var result = _.findWhere(data.attraction.comments, {"details": timestamp.valueOf().toString()});
+                    console.log(result);
                     expect(result).toBeTruthy();
                     end();
                 });

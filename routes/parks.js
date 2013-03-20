@@ -1,5 +1,7 @@
-var http = require('http');
-var _ = require('underscore');
+var http = require('http'),
+    _ = require('underscore'),
+    cacheProvider = require('../park-cache-provider.js').ParkCacheProvider,
+    cache = new cacheProvider();
 
 var locations = [
 	                {"permalink":"parks","name":"Theme Parks"},
@@ -17,8 +19,6 @@ var parks = {
 				]
 			};
 
-var cache = {};
-
 var TOURINGPLANS_PARK_ATTRACTION_LIST_URL = 'http://touringplans.com/{{parkPermalink}}/attractions.json';
 var TOURINGPLANS_PARK_ATTRACTION_DETAIL_URL = 'http://touringplans.com/{{parkPermalink}}/attractions/{{attractionPermalink}}.json';
 
@@ -32,95 +32,93 @@ exports.getParks = function(req, res){
 
 exports.getParkAttractions = function (req, res) {
     var permalink = req.params.parkPermalink;
-    var park = _.findWhere(parks.parks, {"permalink": permalink})
-	req.db.get('SELECT * FROM parkCache WHERE parkPermalink = ? AND attractionPermalink IS NULL', permalink, function(err, row){
-		if (row) {
-			data = {
-				park: park,
-				attractions: JSON.parse(row.data)
-			};
-			res.jsonp(data);
-		} else {
-			sourceUrl = TOURINGPLANS_PARK_ATTRACTION_LIST_URL.replace(/{{parkPermalink}}/g, permalink);
-			http.get(sourceUrl, function(response) {
-				var data = '';
+    var park = _.findWhere(parks.parks, {"permalink": permalink});
+    cache.get({"parkPermalink": permalink}, function(err, data){
+        if (data) {
+            result = {
+                park: park,
+                attractions: data
+            };
+            res.jsonp(result);
+        }
+        else {
+            sourceUrl = TOURINGPLANS_PARK_ATTRACTION_LIST_URL.replace(/{{parkPermalink}}/g, permalink);
+            http.get(sourceUrl, function(response) {
+                var data = '';
 
-				response.on('data', function(chunk) {
-					data += chunk;
-				});
+                response.on('data', function(chunk) {
+                    data += chunk;
+                });
 
-				response.on('end', function() {
-                    req.db.run('INSERT INTO parkCache (parkPermalink, data) VALUES (?, ?)', [permalink, data]);
-					data = JSON.parse(data);
-					resData = {
-						park: park,
-						attractions: data
-					};
-					res.jsonp(resData);
-				});
-			});
-		}
-	});
+                response.on('end', function() {
+                    cache.insert({"parkPermalink": permalink, "data": data});
+                    data = JSON.parse(data);
+                    result = {
+                        park: park,
+                        attractions: data
+                    };
+                    res.jsonp(result);
+                });
+            });
+        }
+    });
 };
 
 exports.getParkAttractionDetails = function (req, res) {
     var parkPermalink = req.params.parkPermalink;
     var attractionPermalink = req.params.attractionPermalink;
     var park = _.findWhere(parks.parks, {"permalink": parkPermalink})
-	req.db.get('SELECT * FROM parkCache WHERE parkPermalink = ? AND attractionPermalink = ?',
-        [parkPermalink, attractionPermalink],
-        function(err, row) {
-            if (row) {
-                // We have visited this endpoint before and cached the data.
-                // Setup return data payload.
-                data = {
-                    park: park,
-                    attraction: JSON.parse(row.data)
-                };
+    cache.get({"parkPermalink": parkPermalink, "attractionPermalink": attractionPermalink}, function(err, data) {
+       if (data) {
+           // We have visited this endpoint before and cached the data.
+           // Setup return data payload.
+           result = {
+               park: park,
+               attraction: data
+           };
 
-                data.attraction.comments = [];
+           result.attraction.comments = [];
 
-                // Get attraction comments.
-                req.db.each('SELECT email, score, details FROM parkAttractionComments WHERE parkPermalink = ? AND attractionPermalink = ?',
-                    [parkPermalink, attractionPermalink],
-                    function(err, row) {
-                        data.attraction.comments.push(
-                            {
-                                email: row.email,
-                                score: row.score,
-                                details: row.details
-                            }
-                        );
-                    },
-                    function (err, numRows) {
-                        res.jsonp(data);
-                    }
-                );
-            } else {
-                // This is the first time we're visiting this TouringPlans endpoint.
-                // We're assuming that there are no comments since we've never visited this endpoint before.
-                sourceUrl = TOURINGPLANS_PARK_ATTRACTION_DETAIL_URL.replace(/{{parkPermalink}}/g, req.params.parkPermalink);
-                sourceUrl = sourceUrl.replace(/{{attractionPermalink}}/g, req.params.attractionPermalink);
-                http.get(sourceUrl, function(response) {
-                    var data = '';
+           // Get attraction comments.
+           req.db.each('SELECT email, score, details FROM parkAttractionComments WHERE parkPermalink = ? AND attractionPermalink = ?',
+               [parkPermalink, attractionPermalink],
+               function(err, row) {
+                   result.attraction.comments.push(
+                       {
+                           email: row.email,
+                           score: row.score,
+                           details: row.details
+                       }
+                   );
+               },
+               function (err, numRows) {
+                   res.jsonp(result);
+               }
+           );
+       } else {
+           // This is the first time we're visiting this TouringPlans endpoint.
+           // We're assuming that there are no comments since we've never visited this endpoint before.
+           sourceUrl = TOURINGPLANS_PARK_ATTRACTION_DETAIL_URL.replace(/{{parkPermalink}}/g, req.params.parkPermalink);
+           sourceUrl = sourceUrl.replace(/{{attractionPermalink}}/g, req.params.attractionPermalink);
+           http.get(sourceUrl, function(response) {
+               var data = '';
 
-                    response.on('data', function(chunk) {
-                        data += chunk;
-                    });
+               response.on('data', function(chunk) {
+                   data += chunk;
+               });
 
-                    response.on('end', function() {
-                        req.db.run('INSERT INTO parkCache VALUES(?, ?, ?)', [parkPermalink, attractionPermalink, data]);
-                        data = JSON.parse(data);
-                        resData = {
-                            park: park,
-                            attraction: data
-                        };
-                        res.jsonp(resData);
-                    });
-                });
-            }
-        }
-    );
+               response.on('end', function() {
+                   cache.insert({"parkPermalink": parkPermalink, "attractionPermalink": attractionPermalink, "data" : data});
+                   data = JSON.parse(data);
+                   result = {
+                       park: park,
+                       attraction: data
+                   };
+                   res.jsonp(result);
+               });
+           });
+       }
+    });
 };
 
 // Unit test on command line with:

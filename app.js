@@ -8,10 +8,11 @@ var express = require('express')
   , parks = require('./routes/parks')
   , http = require('http')
   , path = require('path')
-  , fs = require('fs');
+  , fs = require('fs')
+  , db = null;
 
+//Export app so it is accessible for unit testing.
 exports.app = app = express();
-var db = null;
 
 // Create application database if it does not exist.
 fs.exists('./app.db', function (exists) {
@@ -38,6 +39,7 @@ app.configure(function(){
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(function(req, res, next) {
+    //Provide a reference to the database in the request for external route modules to use.
     req.db = db;
     next();
   });  
