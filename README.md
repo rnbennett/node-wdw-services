@@ -6,9 +6,7 @@ Data is pulled dynamically from the [TouringPlans.com](http://www.touringplans.c
 
 This service makes a great (and fun) base for trying out JavaScript MVC frameworks including AngularJS and Backbone.js.
 
-This app is configured to use EJS, which I find easier to use when bootstrapping a single page app that is already written in pure HTML. Uncomment line 36 in app.js to enable the index route.
-
-If you don't plan on bootstrapping with server-side data, you can place static HTML in the public folder, using index.html as an entry point.
+If you don't plan on bootstrapping with server-side data via EJS views, you can place static HTML in the public folder, using index.html as an entry point.
 
 # Prerequisites
 
