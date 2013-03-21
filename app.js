@@ -4,31 +4,13 @@
  */
 
 var express = require('express'),
-    sqlite3 = require('sqlite3'),
-    parks = require('./routes/parks'),
     http = require('http'),
     path = require('path'),
     fs = require('fs'),
-    db = null;
+    parks = require('./routes/parks');
 
 //Export app so it is accessible for unit testing.
 exports.app = app = express();
-
-// Create application database if it does not exist.
-fs.exists('./app.db', function (exists) {
-    db = new sqlite3.Database('./app.db');
-
-    if (!exists) {
-        console.info('Creating database. This may take a while...');
-        fs.readFile('app.sql', 'utf8', function (err, data) {
-            if (err) throw err;
-            db.exec(data, function (err) {
-                if (err) throw err;
-                console.info('Done.');
-            });
-        });
-    }
-});
 
 app.configure(function(){
   app.set('port', process.env.PORT || 3000);
@@ -38,11 +20,6 @@ app.configure(function(){
   app.use(express.logger('dev'));
   app.use(express.bodyParser());
   app.use(express.methodOverride());
-  app.use(function(req, res, next) {
-    //Provide a reference to the database in the request for external route modules to use.
-    req.db = db;
-    next();
-  });  
   app.use(app.router);
   app.use(express.static(path.join(__dirname, 'public')));
 });
