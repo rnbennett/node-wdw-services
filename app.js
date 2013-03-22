@@ -5,8 +5,9 @@
 
 var express = require('express'),
     http = require('http'),
-    config = require('./config.js');
-    parks = require('./routes/parks');
+    config = require('./config.js'),
+    locations = require('./routes/locations.js');
+    parks = require('./routes/parks.js');
 
 //Export app so it is accessible for unit testing.
 exports.app = app = express();
@@ -27,7 +28,7 @@ app.configure('development', function(){
   app.use(express.errorHandler());
 });
 
-app.get('/locations', parks.getLocations);
+app.get('/locations', locations.getLocations);
 app.get('/locations/parks', parks.getParks);
 app.get('/locations/parks/:parkPermalink', parks.getParkAttractions);
 app.get('/locations/parks/:parkPermalink/:attractionPermalink', parks.getParkAttractionDetails);

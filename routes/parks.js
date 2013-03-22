@@ -6,12 +6,6 @@ var http = require('http'),
     cache = new cacheProvider(),
     comments = new commentProvider();
 
-var locations = [
-    {"permalink":"parks","name":"Theme Parks"},
-    {"permalink":"hotels","name":"Hotels"},
-    {"permalink":"dining","name":"Dining"}
-];
-
 var parks = {
         "location": {"permalink":"parks","name":"Theme Parks"},
         "parks": [
@@ -21,10 +15,6 @@ var parks = {
                 {"permalink":"animal-kingdom","name":"Disney's Animal Kingdom"}
         ]
     };
-
-exports.getLocations = function(req, res){
-  res.jsonp(locations);
-};
 
 exports.getParks = function(req, res){
   res.jsonp(parks);
