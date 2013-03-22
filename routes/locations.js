@@ -1,9 +1,8 @@
-var locations = [
-    {"permalink":"parks","name":"Theme Parks"},
-    {"permalink":"hotels","name":"Hotels"},
-    {"permalink":"dining","name":"Dining"}
-];
+var locationProvider = require('../providers/location-provider.js'),
+    locations = new locationProvider();
 
 exports.getLocations = function(req, res){
-    res.jsonp(locations);
+    locations.get(null, function(err, data) {
+        res.jsonp(data);
+    });
 };
