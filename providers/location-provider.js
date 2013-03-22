@@ -1,13 +1,15 @@
-function LocationProvider () {}
-
-LocationProvider.prototype.get = function(item, callback) {
+function LocationProvider () {
+    //private data accessible to private / privileged methods
     var data = [
         {"permalink":"parks","name":"Theme Parks"},
         {"permalink":"hotels","name":"Hotels"},
         {"permalink":"dining","name":"Dining"}
     ];
 
-    return callback(null, data);
-};
+    //privileged public method
+    this.get = function(item, callback) {
+        return callback(null, data);
+    };
+}
 
 module.exports = LocationProvider;
