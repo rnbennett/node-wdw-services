@@ -5,15 +5,14 @@
 
 var express = require('express'),
     http = require('http'),
-    path = require('path'),
-    fs = require('fs'),
+    config = require('./config.js');
     parks = require('./routes/parks');
 
 //Export app so it is accessible for unit testing.
 exports.app = app = express();
 
 app.configure(function(){
-  app.set('port', process.env.PORT || 3000);
+  app.set('port', process.env.PORT || config.server.listenPort);
   app.set('views', __dirname + '/views');
   app.set('view engine', 'ejs');
   app.use(express.favicon());
@@ -21,7 +20,7 @@ app.configure(function(){
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(app.router);
-  app.use(express.static(path.join(__dirname, 'public')));
+  app.use(express.static(config.server.publicFolder));
 });
 
 app.configure('development', function(){

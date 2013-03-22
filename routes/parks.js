@@ -1,5 +1,6 @@
 var http = require('http'),
     _ = require('underscore'),
+    config = require('../config'),
     cacheProvider = require('../providers/park-cache-provider.js').ParkCacheProvider,
     commentProvider = require('../providers/park-comment-provider.js').ParkCommentProvider,
     cache = new cacheProvider(),
@@ -21,9 +22,6 @@ var parks = {
         ]
     };
 
-var TOURINGPLANS_PARK_ATTRACTION_LIST_URL = 'http://touringplans.com/{{parkPermalink}}/attractions.json';
-var TOURINGPLANS_PARK_ATTRACTION_DETAIL_URL = 'http://touringplans.com/{{parkPermalink}}/attractions/{{attractionPermalink}}.json';
-
 exports.getLocations = function(req, res){
   res.jsonp(locations);
 };
@@ -44,7 +42,7 @@ exports.getParkAttractions = function (req, res) {
             res.jsonp(result);
         }
         else {
-            sourceUrl = TOURINGPLANS_PARK_ATTRACTION_LIST_URL.replace(/{{parkPermalink}}/g, permalink);
+            sourceUrl = config.touringplans.park.attractionList.replace(/{{parkPermalink}}/g, permalink);
             http.get(sourceUrl, function(response) {
                 var data = '';
 
@@ -90,7 +88,7 @@ exports.getParkAttractionDetails = function (req, res) {
        } else {
            // This is the first time we're visiting this TouringPlans endpoint.
            // We're assuming that there are no comments since we've never visited this endpoint before.
-           sourceUrl = TOURINGPLANS_PARK_ATTRACTION_DETAIL_URL.replace(/{{parkPermalink}}/g, req.params.parkPermalink);
+           sourceUrl = config.touringplans.park.attractionDetail.replace(/{{parkPermalink}}/g, req.params.parkPermalink);
            sourceUrl = sourceUrl.replace(/{{attractionPermalink}}/g, req.params.attractionPermalink);
            http.get(sourceUrl, function(response) {
                var data = '';

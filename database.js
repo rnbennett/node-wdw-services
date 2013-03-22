@@ -1,6 +1,6 @@
+var config = require('./config.js');
 var sqlite3 = require('sqlite3');
-var fs = require('fs');
 
-var db = new sqlite3.Database('./app.db');
+var db = new sqlite3.Database(config.sqlite.dbPath);
 
 module.exports = exports = db;
