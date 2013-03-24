@@ -12,3 +12,8 @@ CREATE TABLE parkAttractionComments (
   score INTEGER,
   details TEXT
 );
+
+CREATE TABLE hotelCache (
+  hotelPermalink TEXT,
+  data TEXT
+);
