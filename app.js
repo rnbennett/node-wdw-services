@@ -6,8 +6,9 @@
 var express = require('express'),
     http = require('http'),
     config = require('./config.js'),
-    locations = require('./routes/locations.js');
-    parks = require('./routes/parks.js');
+    locations = require('./routes/locations.js'),
+    parks = require('./routes/parks.js'),
+    hotels = require('./routes/hotels.js');
 
 //Export app so it is accessible for unit testing.
 exports.app = app = express();
@@ -29,10 +30,14 @@ app.configure('development', function(){
 });
 
 app.get('/locations', locations.getLocations);
+
 app.get('/locations/parks', parks.getParks);
 app.get('/locations/parks/:parkPermalink', parks.getParkAttractions);
 app.get('/locations/parks/:parkPermalink/:attractionPermalink', parks.getParkAttractionDetails);
 app.post('/locations/parks/:parkPermalink/:attractionPermalink/comment', parks.setParkAttractionComment);
+
+app.get('/locations/hotels', hotels.getHotels);
+app.get('/locations/hotels/:hotelPermalink', hotels.getHotelDetails);
 
 //Only run the server if this file is run directly. Lets us use test-helper for testing.
 if (__filename == process.argv[1]) {

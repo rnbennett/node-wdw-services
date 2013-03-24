@@ -16,6 +16,10 @@ module.exports = {
         park: {
             attractionList: 'http://touringplans.com/{{parkPermalink}}/attractions.json',
             attractionDetail: 'http://touringplans.com/{{parkPermalink}}/attractions/{{attractionPermalink}}.json'
+        },
+        hotel: {
+            hotelList: 'http://touringplans.com/walt-disney-world/hotels.json',
+            hotelDetail: 'http://touringplans.com/walt-disney-world/hotels/{{hotelPermalink}}.json'
         }
     },
     server: {

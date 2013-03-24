@@ -137,6 +137,57 @@ Be sure to specify `Content-Type: application/json` in the HTTP header of your P
         "details": "this is a comment"
 	}
 
+**GET: /locations/hotels** - lists the Hotels available.
+
+    [
+      [
+        "Deluxe",
+        [
+          ...
+          {
+            "permalink": "disneys-contemporary-resort",
+            "name": "Disney's Contemporary Resort"
+          }
+          ...
+      ],
+      [
+        "Moderate",
+        [
+          {
+            "permalink": "disneys-caribbean-beach-resort",
+            "name": "Disney's Caribbean Beach Resort"
+          }
+          ...
+        ]
+      ],
+      [
+        "Value",
+        [
+          ...
+          {
+            "permalink": "disneys-pop-century-resort",
+            "name": "Disney's Pop Century Resort"
+          }
+        ]
+      ]
+    ]
+
+**GET: /locations/parks/:hotelPermalink** - lists a hotel's details.
+
+    {
+      "water_sports": true,
+      "permalink": "disneys-contemporary-resort",
+      "num_rooms": 655,
+      "name": "Disney's Contemporary Resort",
+      "theme": "Future as perceived by past, present generations",
+      "overall_rating": 4.5,
+      "tennis": false,
+      "room_rating": 93,
+      "category_code": "deluxe",
+      "room_service": true,
+      ...
+    }
+
 # Running the tests
 
 Jasmine spec tests are located in the spec folder. Tests require installing [jasmine-node](https://github.com/mhevery/jasmine-node) globally via NPM.
