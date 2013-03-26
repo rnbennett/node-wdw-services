@@ -38,6 +38,7 @@ app.post('/locations/parks/:parkPermalink/:attractionPermalink/comment', parks.s
 
 app.get('/locations/hotels', hotels.getHotels);
 app.get('/locations/hotels/:hotelPermalink', hotels.getHotelDetails);
+app.post('/locations/hotels/:hotelPermalink/comment', hotels.setHotelComment);
 
 //Only run the server if this file is run directly. Lets us use test-helper for testing.
 if (__filename == process.argv[1]) {

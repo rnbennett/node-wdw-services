@@ -1,10 +1,12 @@
 var helper = require('./test-helper.js'),
-    cacheProvider = require('../providers/park-cache-provider.js').ParkCacheProvider,
-    cache = new cacheProvider(),
+    parkCacheProvider = require('../providers/park-cache-provider.js').ParkCacheProvider,
+    parkCache = new parkCacheProvider(),
+    hotelCacheProvider = require('../providers/hotel-cache-provider.js').HotelCacheProvider,
+    hotelCache = new hotelCacheProvider(),
     _ = require('underscore'),
     timestamp = new Date();
 
-describe("The WDW Node Service", function() {
+describe("The WDW Node Park Service Endpoints", function() {
     describe("GET /locations", function() {
 
         it("responds successfully", function(done) {
@@ -94,7 +96,7 @@ describe("The WDW Node Service", function() {
         });
 
         it("has been placed in cache", function(done) {
-            cache.get({"parkPermalink": "magic-kingdom"}, function(err, data) {
+            parkCache.get({"parkPermalink": "magic-kingdom"}, function(err, data) {
                 expect(data).toBeTruthy();
                 done();
             });
@@ -135,7 +137,7 @@ describe("The WDW Node Service", function() {
         });
 
         it("has been placed in cache", function(done) {
-            cache.get({"parkPermalink": "magic-kingdom", "attractionPermalink": "space-mountain"}, function(err, data){
+            parkCache.get({"parkPermalink": "magic-kingdom", "attractionPermalink": "space-mountain"}, function(err, data){
                 expect(data).toBeTruthy();
                 done();
             });
@@ -173,6 +175,107 @@ describe("The WDW Node Service", function() {
                 r.get("/locations/parks/magic-kingdom/space-mountain", function(err, res, body){
                     var data = JSON.parse(body);
                     var result = _.findWhere(data.attraction.comments, {"details": timestamp.valueOf().toString()});
+                    expect(result).toBeTruthy();
+                    end();
+                });
+            });
+        });
+
+    });
+});
+
+describe("The WDW Node Service Hotel Endpoints", function() {
+
+    describe("GET /locations/hotels", function() {
+
+        it("responds successfully", function(done) {
+            helper.withServer(done, function(r, end) {
+                r.get("/locations/hotels", function(err, res){
+                    expect(res.statusCode).toEqual(200);
+                    end();
+                }) ;
+            });
+        });
+
+        it("contains four categories", function(done) {
+            helper.withServer(done, function(r, end) {
+                r.get("/locations/hotels", function(err, res, body){
+                    data = JSON.parse(body);
+                    expect(data.length).toBe(4);
+                    end();
+                });
+            });
+        });
+
+        it("has been placed in cache", function(done) {
+            hotelCache.get({"hotelPermalink": "all"}, function(err, data){
+                expect(data).toBeTruthy();
+                done();
+            });
+        });
+
+    });
+
+    describe("GET /locations/hotels/:hotelPermalink", function() {
+
+        it("responds successfully", function(done) {
+            helper.withServer(done, function(r, end) {
+                r.get("/locations/hotels/disneys-contemporary-resort", function(err, res){
+                    expect(res.statusCode).toEqual(200);
+                    end();
+                }) ;
+            });
+        });
+
+        it("provides the correct hotel", function(done) {
+            helper.withServer(done, function(r, end) {
+                r.get("/locations/hotels/disneys-contemporary-resort", function(err, res, body){
+                    data = JSON.parse(body);
+                    expect(data.permalink).toMatch(/disneys-contemporary-resort/);
+                    end();
+                });
+            });
+        });
+
+        it("has been placed in cache", function(done) {
+            hotelCache.get({"hotelPermalink": "disneys-contemporary-resort"}, function(err, data){
+                expect(data).toBeTruthy();
+                done();
+            });
+        });
+
+    });
+
+    describe("POST /locations/hotels/:hotelPermalink/comment", function() {
+
+        it("rejects GET requests", function(done) {
+            helper.withServer(done, function(r, end) {
+                r.get("/locations/hotels/disneys-contemporary-resort/comment", function(err, res){
+                    expect(res.statusCode).toEqual(404);
+                    end();
+                }) ;
+            });
+        });
+
+        it("accepts JSON data", function(done) {
+            helper.withServer(done, function(r, end) {
+                data = {"email": "test@spec.com", "score": 5, "details": timestamp.valueOf().toString()};
+                r.postJSON( '/locations/hotels/disneys-contemporary-resort/comment', JSON.stringify(data), function(err, res){
+                    expect(res.statusCode).toEqual(200);
+                    end();
+                });
+            });
+        });
+
+    });
+
+    describe("Attraction comments in GET /locations/hotels/:hotelPermalink", function() {
+
+        it("contains the comment POSTed in the last test", function(done) {
+            helper.withServer(done, function(r, end) {
+                r.get("/locations/hotels/disneys-contemporary-resort", function(err, res, body){
+                    var data = JSON.parse(body);
+                    var result = _.findWhere(data.comments, {"details": timestamp.valueOf().toString()});
                     expect(result).toBeTruthy();
                     end();
                 });
